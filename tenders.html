@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aichamiyaa Supplier – Tender Dashboard</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #050505;
+      color: #f5f5f5;
+    }
+
+    header {
+      background: #000;
+      border-bottom: 2px solid #d4af37;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.3rem;
+      color: #d4af37;
+    }
+
+    nav a {
+      color: #f5f5f5;
+      text-decoration: none;
+      margin-left: 16px;
+      font-size: 0.9rem;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+    main {
+      max-width: 1000px;
+      margin: 20px auto 40px;
+      padding: 0 16px;
+    }
+
+    h2 {
+      color: #d4af37;
+      margin-top: 0;
+    }
+
+    .card {
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      margin-top: 10px;
+    }
+
+    input[type="text"],
+    input[type="date"],
+    textarea {
+      width: 100%;
+      margin-top: 4px;
+      padding: 8px;
+      border-radius: 4px;
+      border: 1px solid #444;
+      background: #000;
+      color: #f5f5f5;
+      font-size: 0.85rem;
+    }
+
+    textarea {
+      min-height: 70px;
+      resize: vertical;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .row > div {
+      flex: 1;
+      min-width: 160px;
+    }
+
+    .checkbox-row {
+      margin-top: 10px;
+      font-size: 0.85rem;
+    }
+
+    button {
+      margin-top: 14px;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 4px;
+      background: #d4af37;
+      color: #000;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
+    button:hover {
+      filter: brightness(1.1);
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-size: 0.85rem;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+
+    .filters label {
+      margin-top: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 0.8rem;
+    }
+
+    th, td {
+      border: 1px solid #333;
+      padding: 6px 8px;
+      vertical-align: top;
+    }
+
+    th {
+      background: #222;
+      color: #d4af37;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      margin-right: 4px;
+    }
+
+    .tag-active {
+      background: #0b5;
+      color: #000;
+    }
+
+    .tag-expired {
+      background: #b00;
+      color: #fff;
+    }
+
+    .tag-goods {
+      background: #d4af37;
+      color: #000;
+    }
+
+    .small-btn {
+      font-size: 0.7rem;
+      padding: 4px 8px;
+      margin-top: 4px;
+    }
+
+    a.link {
+      color: #d4af37;
+      word-break: break-all;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: #aaa;
+      padding: 20px 0 30px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Aichamiyaa Supplier – Tender Dashboard</h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="tenders.html">Tenders</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>Add CanadaBuys Tender (Goods Only Focus)</h2>
+      <p style="font-size:0.85rem; color:#ccc;">
+        When you find a CanadaBuys opportunity where the government is buying <strong>goods</strong> (products, equipment, supplies),
+        add it here. This dashboard will track <strong>Active vs Expired</strong> and help you copy clean info into ChatGPT.
+      </p>
+
+      <div class="row">
+        <div>
+          <label>Tender Title</label>
+          <input id="titleInput" type="text" placeholder="Example: Supply of Nitrile Gloves" />
+        </div>
+        <div>
+          <label>Tender Number</label>
+          <input id="numberInput" type="text" placeholder="Example: W8486-26GLVE/A" />
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>Buyer / Department</label>
+          <input id="buyerInput" type="text" placeholder="Example: DND, PSPC, SSC..." />
+        </div>
+        <div>
+          <label>Closing Date</label>
+          <input id="closingInput" type="date" />
+        </div>
+      </div>
+
+      <label>CanadaBuys Link</label>
+      <input id="linkInput" type="text" placeholder="https://canadabuys.canada.ca/..." />
+
+      <div class="checkbox-row">
+        <label>
+          <input id="goodsInput" type="checkbox" />
+          This is a <strong>Goods</strong> tender (government buying products, not pure services).
+        </label>
+      </div>
+
+      <label>Notes / Key Requirements (copy from the tender)</label>
+      <textarea id="notesInput" placeholder="Paste main product requirements, quantities, delivery, warranty, etc."></textarea>
+
+      <button id="addTenderBtn">Add to Dashboard</button>
+    </section>
+
+    <section class="card">
+      <h2>Your Tracked Tenders</h2>
+      <div class="filters">
+        <label>
+          <input type="checkbox" id="filterActive" checked />
+          Show active only
+        </label>
+        <label>
+          <input type="checkbox" id="filterGoods" checked />
+          Show goods tenders only
+        </label>
+      </div>
+      <div id="noTendersMsg" style="font-size:0.85rem; color:#aaa;">
+        No tenders added yet. Add your first one above.
+      </div>
+      <table id="tendersTable" style="display:none;">
+        <thead>
+          <tr>
+            <th>Info</th>
+            <th>Status</th>
+            <th>Notes / Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tendersBody"></tbody>
+      </table>
+    </section>
+  </main>
+
+  <footer>
+    © <script>document.write(new Date().getFullYear())</script> Aichamiyaa Supplier – Internal Tender Dashboard (Phase 1)
+  </footer>
+
+  <script>
+    const titleInput = document.getElementById("titleInput");
+    const numberInput = document.getElementById("numberInput");
+    const buyerInput = document.getElementById("buyerInput");
+    const closingInput = document.getElementById("closingInput");
+    const linkInput = document.getElementById("linkInput");
+    const goodsInput = document.getElementById("goodsInput");
+    const notesInput = document.getElementById("notesInput");
+
+    const addTenderBtn = document.getElementById("addTenderBtn");
+    const tendersTable = document.getElementById("tendersTable");
+    const tendersBody = document.getElementById("tendersBody");
+    const noTendersMsg = document.getElementById("noTendersMsg");
+    const filterActive = document.getElementById("filterActive");
+    const filterGoods = document.getElementById("filterGoods");
+
+    const STORAGE_KEY = "aichamiyaa_tenders_v1";
+
+    function loadTenders() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return [];
+      try {
+        return JSON.parse(raw);
+      } catch (e) {
+        console.error("Failed to parse tenders:", e);
+        return [];
+      }
+    }
+
+    function saveTenders(list) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    }
+
+    function isExpired(closingDateStr) {
+      if (!closingDateStr) return false;
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      const d = new Date(closingDateStr);
+      return d < today;
+    }
+
+    function renderTenders() {
+      const tenders = loadTenders();
+      const onlyActive = filterActive.checked;
+      const onlyGoods = filterGoods.checked;
+
+      const filtered = tenders.filter(t => {
+        if (onlyActive && isExpired(t.closingDate)) return false;
+        if (onlyGoods && !t.isGoods) return false;
+        return true;
+      });
+
+      tendersBody.innerHTML = "";
+
+      if (filtered.length === 0) {
+        tendersTable.style.display = "none";
+        noTendersMsg.style.display = "block";
+        return;
+      }
+
+      tendersTable.style.display = "table";
+      noTendersMsg.style.display = "none";
+
+      filtered.forEach((tender, index) => {
+        const tr = document.createElement("tr");
+
+        const infoTd = document.createElement("td");
+        infoTd.innerHTML = `
+          <strong>${tender.title || "(No title)"}</strong><br />
+          <span>Tender No: ${tender.number || "-"}</span><br />
+          <span>Buyer: ${tender.buyer || "-"}</span><br />
+          <span>Closing: ${tender.closingDate || "-"}</span><br />
+          ${tender.link ? `<a class="link" href="${tender.link}" target="_blank">Open in CanadaBuys</a>` : ""}
+        `;
+
+        const statusTd = document.createElement("td");
+        const expired = isExpired(tender.closingDate);
+
+        const statusTag = document.createElement("span");
+        statusTag.className = "tag " + (expired ? "tag-expired" : "tag-active");
+        statusTag.textContent = expired ? "EXPIRED" : "ACTIVE";
+        statusTd.appendChild(statusTag);
+
+        if (tender.isGoods) {
+          const goodsTag = document.createElement("span");
+          goodsTag.className = "tag tag-goods";
+          goodsTag.textContent = "GOODS";
+          statusTd.appendChild(goodsTag);
+        }
+
+        const notesTd = document.createElement("td");
+        const safeNotes = (tender.notes || "").replace(/\n/g, "<br />");
+
+        notesTd.innerHTML = `
+          <div style="max-height:100px; overflow:auto; margin-bottom:4px;">
+            ${safeNotes || "<span style='color:#777;'>No notes yet.</span>"}
+          </div>
+        `;
+
+        const copyBtn = document.createElement("button");
+        copyBtn.className = "small-btn";
+        copyBtn.textContent = "Copy summary for ChatGPT";
+        copyBtn.addEventListener("click", () => copySummary(tender));
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "small-btn";
+        deleteBtn.style.background = "#444";
+        deleteBtn.style.color = "#fff";
+        deleteBtn.style.marginLeft = "4px";
+        deleteBtn.textContent = "Delete";
+        deleteBtn.addEventListener("click", () => deleteTender(tender.id));
+
+        notesTd.appendChild(copyBtn);
+        notesTd.appendChild(deleteBtn);
+
+        tr.appendChild(infoTd);
+        tr.appendChild(statusTd);
+        tr.appendChild(notesTd);
+
+        tendersBody.appendChild(tr);
+      });
+    }
+
+    function copySummary(tender) {
+      const text = `
+Tender summary for Aichamiyaa Supplier:
+
+Title: ${tender.title || "-"}
+Tender Number: ${tender.number || "-"}
+Buyer / Department: ${tender.buyer || "-"}
+Closing Date: ${tender.closingDate || "-"}
+Goods Tender: ${tender.isGoods ? "YES (goods / products)" : "Not marked as goods"}
+CanadaBuys Link: ${tender.link || "-"}
+
+Key requirements / notes (copied from dashboard):
+${tender.notes || "-"}
+
+Please:
+1) Extract all product requirements, quantities, delivery conditions, warranty, and mandatory criteria from this information.
+2) Prepare a sourcing plan (what kind of suppliers to contact and what to ask them).
+3) Draft a technical response structure and compliance checklist for this tender.
+4) Suggest a price request email I can send to suppliers, including tender number and closing date.
+      `.trim();
+
+      navigator.clipboard.writeText(text)
+        .then(() => {
+          alert("Summary copied. Paste it into ChatGPT to continue the work.");
+        })
+        .catch(err => {
+          console.error("Copy failed:", err);
+          alert("Could not copy to clipboard. You can select and copy manually.");
+        });
+    }
+
+    function deleteTender(id) {
+      const tenders = loadTenders();
+      const next = tenders.filter(t => t.id !== id);
+      saveTenders(next);
+      renderTenders();
+    }
+
+    addTenderBtn.addEventListener("click", () => {
+      const title = titleInput.value.trim();
+      const number = numberInput.value.trim();
+      const buyer = buyerInput.value.trim();
+      const closingDate = closingInput.value;
+      const link = linkInput.value.trim();
+      const isGoods = goodsInput.checked;
+      const notes = notesInput.value.trim();
+
+      if (!title && !number && !link) {
+        alert("Please provide at least a title, tender number, or link.");
+        return;
+      }
+
+      const tenders = loadTenders();
+      const newTender = {
+        id: Date.now(),
+        title,
+        number,
+        buyer,
+        closingDate,
+        link,
+        isGoods,
+        notes
+      };
+
+      tenders.push(newTender);
+      saveTenders(tenders);
+
+      titleInput.value = "";
+      numberInput.value = "";
+      buyerInput.value = "";
+      closingInput.value = "";
+      linkInput.value = "";
+      goodsInput.checked = false;
+      notesInput.value = "";
+
+      renderTenders();
+    });
+
+    filterActive.addEventListener("change", renderTenders);
+    filterGoods.addEventListener("change", renderTenders);
+
+    // initial
+    renderTenders();
+  </script>
+</body>
+</html>
