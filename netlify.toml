@@ -1,0 +1,16 @@
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+[[headers]]
+  for = "/command-center.html"
+  [headers.values]
+    Cache-Control = "private, no-store"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "no-referrer"
+
+[[headers]]
+  for = "/login.html"
+  [headers.values]
+    Cache-Control = "no-store"
+    X-Frame-Options = "DENY"

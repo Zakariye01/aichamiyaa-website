@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aichamiyaa Procurement Command Centre</title>
+  <style>
+    :root {
+      --bg: #050505;
+      --panel: #0d0d0d;
+      --panel-2: #14120b;
+      --gold: #d4af37;
+      --gold-light: #f6dc7a;
+      --text: #f7f7f7;
+      --muted: #aaa;
+      --line: rgba(212,175,55,.3);
+      --green: #61d095;
+      --red: #ff7d7d;
+      --blue: #74b8ff;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif; }
+    button,input,select,textarea { font: inherit; }
+    button { cursor: pointer; }
+    .shell { min-height: 100vh; display: grid; grid-template-columns: 245px minmax(0,1fr); }
+    aside { padding: 22px 16px; border-right: 1px solid var(--line); background: #080808; position: sticky; top: 0; height: 100vh; }
+    .brand { display: flex; gap: 10px; align-items: center; margin: 0 6px 28px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+    .mark { width: 34px; height: 34px; display: grid; place-items: center; border: 2px solid var(--gold); border-radius: 50%; color: var(--gold); }
+    .brand small { display: block; color: var(--muted); font-size: 10px; letter-spacing: .16em; }
+    nav { display: grid; gap: 7px; }
+    .nav-btn { width: 100%; padding: 11px 12px; border: 1px solid transparent; border-radius: 9px; background: transparent; color: #ccc; text-align: left; }
+    .nav-btn.active { color: var(--gold-light); border-color: var(--line); background: var(--panel-2); }
+    .private-note { position: absolute; left: 16px; right: 16px; bottom: 20px; padding: 12px; border: 1px solid #333; border-radius: 9px; color: var(--muted); font-size: 12px; }
+    main { padding: 26px clamp(18px,3vw,42px) 50px; overflow: hidden; }
+    .topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 24px; }
+    h1,h2,h3,p { margin-top: 0; }
+    h1 { margin-bottom: 4px; font-size: clamp(24px,3vw,36px); }
+    .subtitle { color: var(--muted); }
+    .status { padding: 8px 12px; border: 1px solid rgba(97,208,149,.35); border-radius: 999px; color: var(--green); white-space: nowrap; }
+    .view { display: none; }
+    .view.active { display: block; }
+    .metrics { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 12px; margin-bottom: 20px; }
+    .metric,.card { border: 1px solid var(--line); border-radius: 13px; background: var(--panel); }
+    .metric { padding: 16px; }
+    .metric span { display: block; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
+    .metric strong { display: block; margin-top: 5px; color: var(--gold-light); font-size: 27px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; }
+    .card { padding: 18px; margin-bottom: 16px; }
+    .card-head { display: flex; justify-content: space-between; gap: 14px; align-items: center; margin-bottom: 14px; }
+    .card-head h2,.card-head h3 { margin: 0; }
+    .eyebrow { color: var(--gold); font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+    .workflow { display: grid; gap: 9px; }
+    .workflow-item { display: grid; grid-template-columns: 31px 1fr auto; gap: 10px; align-items: center; padding: 11px; border: 1px solid #292929; border-radius: 9px; }
+    .step { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; background: #201b0c; color: var(--gold-light); }
+    .pending { color: var(--muted); font-size: 12px; }
+    .connected { color: var(--green); font-size: 12px; }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+    .btn { border: 1px solid var(--line); border-radius: 9px; padding: 9px 13px; background: #151515; color: var(--text); }
+    .btn.gold { background: linear-gradient(135deg,var(--gold),var(--gold-light)); color: #050505; border: 0; font-weight: 800; }
+    .btn.danger { color: var(--red); }
+    .search { flex: 1 1 220px; }
+    input,select,textarea { width: 100%; padding: 10px 11px; border: 1px solid #383838; border-radius: 8px; background: #070707; color: var(--text); }
+    textarea { min-height: 90px; resize: vertical; }
+    label { display: grid; gap: 5px; color: #ccc; font-size: 13px; }
+    .form-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+    .full { grid-column: 1/-1; }
+    table { width: 100%; border-collapse: collapse; }
+    th,td { padding: 11px 9px; border-bottom: 1px solid #282828; text-align: left; vertical-align: top; }
+    th { color: var(--muted); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+    .table-wrap { overflow-x: auto; }
+    .tag { display: inline-block; padding: 3px 7px; border-radius: 999px; background: #24200f; color: var(--gold-light); font-size: 11px; }
+    .empty { padding: 28px 12px; text-align: center; color: var(--muted); }
+    dialog { width: min(720px,calc(100% - 28px)); max-height: 88vh; overflow: auto; border: 1px solid var(--line); border-radius: 14px; background: #101010; color: var(--text); padding: 20px; }
+    dialog::backdrop { background: rgba(0,0,0,.78); }
+    .dialog-actions { display: flex; justify-content: flex-end; gap: 9px; margin-top: 16px; }
+    .proposal { padding: 25px; border: 1px solid var(--line); background: #fff; color: #151515; }
+    .proposal h2 { color: #8f7010; }
+    .proposal .proposal-brand { border-bottom: 3px solid var(--gold); padding-bottom: 12px; margin-bottom: 18px; }
+    .proposal-meta { color: #555; }
+    .notice { padding: 12px 14px; border-left: 3px solid var(--gold); background: #18150b; color: #ddd; }
+    @media (max-width: 900px) {
+      .shell { grid-template-columns: 1fr; }
+      aside { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+      nav { grid-template-columns: repeat(5,minmax(130px,1fr)); overflow-x: auto; }
+      .private-note { position: static; margin-top: 14px; }
+      .metrics { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    }
+    @media (max-width: 650px) {
+      .grid-2,.form-grid { grid-template-columns: 1fr; }
+      .full { grid-column: auto; }
+      .topbar { display: block; }
+      .status { display: inline-block; margin-top: 10px; }
+    }
+    @media print {
+      body * { visibility: hidden; }
+      #proposalOutput,#proposalOutput * { visibility: visible; }
+      #proposalOutput { position: absolute; inset: 0; border: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside>
+      <div class="brand"><span class="mark">A</span><span>Aichamiyaa<small>Command Centre</small></span></div>
+      <nav aria-label="Command Centre sections">
+        <button class="nav-btn active" data-view="overview">Overview</button>
+        <button class="nav-btn" data-view="opportunities">Opportunities</button>
+        <button class="nav-btn" data-view="businesses">Small Businesses</button>
+        <button class="nav-btn" data-view="proposals">Proposals</button>
+        <button class="nav-btn" data-view="automation">Automation</button>
+      </nav>
+      <div class="private-note"><strong>Private preview</strong><br>Not linked from the public website. Live automation connections will be added after approval.</div>
+    </aside>
+
+    <main>
+      <header class="topbar">
+        <div><h1>Procurement Command Centre</h1><p class="subtitle">Government opportunities and small-business growth in one operating system.</p></div>
+        <div><span class="status">● Secure automation ready</span> <button id="logout" class="btn">Sign out</button></div>
+      </header>
+
+      <section id="overview" class="view active">
+        <div class="metrics">
+          <div class="metric"><span>Opportunities</span><strong id="metricOpps">0</strong></div>
+          <div class="metric"><span>Small businesses</span><strong id="metricBusinesses">0</strong></div>
+          <div class="metric"><span>Proposals ready</span><strong id="metricProposals">0</strong></div>
+          <div class="metric"><span>Deadline alerts</span><strong id="metricDeadlines">0</strong></div>
+        </div>
+        <div class="grid-2">
+          <article class="card">
+            <div class="card-head"><div><span class="eyebrow">A-to-Z workflow</span><h2>Government Contract Pipeline</h2></div></div>
+            <div class="workflow">
+              <div class="workflow-item"><span class="step">1</span><span>Discover and filter opportunities</span><span class="connected">Connector tested</span></div>
+              <div class="workflow-item"><span class="step">2</span><span>Extract requirements and score fit</span><span class="pending">Planned</span></div>
+              <div class="workflow-item"><span class="step">3</span><span>Source suppliers and compare quotes</span><span class="pending">Planned</span></div>
+              <div class="workflow-item"><span class="step">4</span><span>Build compliant proposal package</span><span class="connected">Foundation ready</span></div>
+              <div class="workflow-item"><span class="step">5</span><span>Track submission, award and delivery</span><span class="pending">Planned</span></div>
+            </div>
+          </article>
+          <article class="card">
+            <div class="card-head"><div><span class="eyebrow">Client growth</span><h2>Small-Business Pipeline</h2></div></div>
+            <div class="workflow">
+              <div class="workflow-item"><span class="step">1</span><span>Find qualified small businesses</span><span class="pending">Connection next</span></div>
+              <div class="workflow-item"><span class="step">2</span><span>Research public business information</span><span class="pending">Planned</span></div>
+              <div class="workflow-item"><span class="step">3</span><span>Match capabilities to contracts</span><span class="pending">Planned</span></div>
+              <div class="workflow-item"><span class="step">4</span><span>Generate tailored outreach proposal</span><span class="connected">Foundation ready</span></div>
+              <div class="workflow-item"><span class="step">5</span><span>Onboard and manage delivery</span><span class="pending">Planned</span></div>
+            </div>
+          </article>
+        </div>
+        <p class="notice">This first additive milestone creates the operating structure. It does not change or remove any existing website content.</p>
+      </section>
+
+      <section id="opportunities" class="view">
+        <article class="card">
+          <div class="card-head"><div><span class="eyebrow">Pipeline</span><h2>Government Opportunities</h2></div><div><button id="refreshCanadaBuys" class="btn">Check CanadaBuys</button> <button class="btn gold" data-open="opportunityDialog">Add opportunity</button></div></div>
+          <p id="feedStatus" class="notice">The live feed activates in the Netlify preview. Manual records remain available below.</p>
+          <div class="toolbar"><input id="oppSearch" class="search" placeholder="Search title, department or number"><select id="oppFilter"><option value="all">All stages</option><option>Review</option><option>Bid</option><option>Submitted</option><option>Awarded</option></select></div>
+          <div class="table-wrap"><table><thead><tr><th>Opportunity</th><th>Buyer</th><th>Closing</th><th>Fit</th><th>Stage</th><th></th></tr></thead><tbody id="opportunityRows"></tbody></table></div>
+          <div id="opportunityEmpty" class="empty">No opportunities recorded yet. The automated feed will populate this pipeline after it is connected.</div>
+        </article>
+      </section>
+
+      <section id="businesses" class="view">
+        <article class="card">
+          <div class="card-head"><div><span class="eyebrow">Prospects</span><h2>Small-Business Directory</h2></div><button class="btn gold" data-open="businessDialog">Add business</button></div>
+          <div class="toolbar"><input id="businessSearch" class="search" placeholder="Search company, industry, city or capability"></div>
+          <div class="table-wrap"><table><thead><tr><th>Company</th><th>Location</th><th>Capabilities</th><th>Fit reason</th><th>Status</th><th></th></tr></thead><tbody id="businessRows"></tbody></table></div>
+          <div id="businessEmpty" class="empty">No businesses recorded yet. Add one to test the tailored proposal workflow.</div>
+        </article>
+      </section>
+
+      <section id="proposals" class="view">
+        <article class="card">
+          <div class="card-head"><div><span class="eyebrow">Professional outreach</span><h2>Proposal Builder</h2></div></div>
+          <div class="form-grid">
+            <label>Small business<select id="proposalBusiness"><option value="">Select a business</option></select></label>
+            <label>Matched opportunity or service need<input id="proposalOpportunity" placeholder="Example: Municipal cleaning contract"></label>
+            <label class="full">How Aichamiyaa can help<textarea id="proposalHelp" placeholder="Tender monitoring, readiness assessment, compliance review, proposal preparation..."></textarea></label>
+          </div>
+          <div class="dialog-actions"><button id="generateProposal" class="btn gold">Generate proposal</button></div>
+        </article>
+        <div id="proposalOutput" class="proposal" hidden></div>
+        <div id="proposalActions" class="dialog-actions" hidden><button class="btn" onclick="window.print()">Print / Save PDF</button></div>
+      </section>
+
+      <section id="automation" class="view">
+        <article class="card">
+          <div class="card-head"><div><span class="eyebrow">24/7 operations</span><h2>Automation Connections</h2></div></div>
+          <div class="workflow">
+            <div class="workflow-item"><span class="step">1</span><span>Official opportunity sources</span><span class="connected">Connected — activates after deployment</span></div>
+            <div class="workflow-item"><span class="step">2</span><span>Public small-business research</span><span class="pending">Not connected</span></div>
+            <div class="workflow-item"><span class="step">3</span><span>Secure cloud database and login</span><span class="connected">Ready — Netlify secrets required</span></div>
+            <div class="workflow-item"><span class="step">4</span><span>Email outreach and follow-ups</span><span class="pending">Not connected</span></div>
+            <div class="workflow-item"><span class="step">5</span><span>Deadline alerts and scheduled checks</span><span class="connected">Hourly monitor ready</span></div>
+          </div>
+        </article>
+        <p class="notice">No connection is shown as active until it is genuinely configured and tested. Final pricing, declarations, signatures and bid submission remain approval points.</p>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="opportunityDialog">
+    <form id="opportunityForm">
+      <div class="card-head"><h2>Add opportunity</h2><button type="button" class="btn" data-close>Close</button></div>
+      <div class="form-grid">
+        <label>Title<input name="title" required></label><label>Solicitation number<input name="number"></label>
+        <label>Buyer / department<input name="buyer"></label><label>Closing date<input name="closing" type="date"></label>
+        <label>Fit score<select name="fit"><option>High</option><option>Medium</option><option>Low</option></select></label>
+        <label>Stage<select name="stage"><option>Review</option><option>Bid</option><option>Submitted</option><option>Awarded</option></select></label>
+        <label class="full">Requirements and delivery details<textarea name="notes"></textarea></label>
+      </div>
+      <div class="dialog-actions"><button type="button" class="btn" data-close>Cancel</button><button class="btn gold">Save opportunity</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="businessDialog">
+    <form id="businessForm">
+      <div class="card-head"><h2>Add small business</h2><button type="button" class="btn" data-close>Close</button></div>
+      <div class="form-grid">
+        <label>Company name<input name="name" required></label><label>Industry<input name="industry"></label>
+        <label>Public business address<input name="address"></label><label>City / region<input name="location"></label>
+        <label>Website<input name="website" type="url" placeholder="https://"></label><label>Public phone<input name="phone"></label>
+        <label>Public email<input name="email" type="email"></label><label>Status<select name="status"><option>Research</option><option>Ready for outreach</option><option>Contacted</option><option>Client</option></select></label>
+        <label class="full">Products, services and capabilities<textarea name="capabilities"></textarea></label>
+        <label class="full">Why this company is a good fit<textarea name="fitReason"></textarea></label>
+      </div>
+      <div class="dialog-actions"><button type="button" class="btn" data-close>Cancel</button><button class="btn gold">Save business</button></div>
+    </form>
+  </dialog>
+
+  <script>
+    const KEYS={opportunities:"aichamiyaa_cc_opportunities_v1",businesses:"aichamiyaa_cc_businesses_v1",proposals:"aichamiyaa_cc_proposals_v1"};
+    const load=key=>{try{return JSON.parse(localStorage.getItem(key))||[]}catch{return[]}};
+    const save=(key,value)=>localStorage.setItem(key,JSON.stringify(value));
+    const escapeHtml=value=>String(value||"").replace(/[&<>'"]/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[char]));
+    let opportunities=load(KEYS.opportunities),remoteOpportunities=[],businesses=load(KEYS.businesses),proposalCount=Number(localStorage.getItem(KEYS.proposals)||0),cloudEnabled=location.protocol!=="file:";
+
+    async function persistState(){
+      save(KEYS.opportunities,opportunities);save(KEYS.businesses,businesses);localStorage.setItem(KEYS.proposals,String(proposalCount));
+      if(!cloudEnabled)return;
+      const response=await fetch("/.netlify/functions/command-data",{method:"PUT",headers:{"content-type":"application/json"},body:JSON.stringify({manualOpportunities:opportunities,businesses,proposalCount})});
+      if(response.status===401){location.replace("/login.html");throw new Error("Owner session expired.")}
+      if(!response.ok)throw new Error("Cloud records could not be saved.");
+    }
+
+    async function loadCloudState(){
+      if(!cloudEnabled)return;
+      const response=await fetch("/.netlify/functions/command-data",{cache:"no-store"});
+      if(response.status===401){location.replace("/login.html");return}
+      if(!response.ok)throw new Error("Cloud records could not be loaded.");
+      const state=await response.json(),localHasData=opportunities.length||businesses.length||proposalCount;
+      if(!state.updatedAt&&localHasData){await persistState();return}
+      opportunities=state.manualOpportunities||[];businesses=state.businesses||[];proposalCount=Number(state.proposalCount)||0;
+      save(KEYS.opportunities,opportunities);save(KEYS.businesses,businesses);localStorage.setItem(KEYS.proposals,String(proposalCount));
+    }
+
+    document.querySelectorAll(".nav-btn").forEach(btn=>btn.addEventListener("click",()=>{
+      document.querySelectorAll(".nav-btn,.view").forEach(el=>el.classList.remove("active"));
+      btn.classList.add("active"); document.getElementById(btn.dataset.view).classList.add("active");
+    }));
+    document.querySelectorAll("[data-open]").forEach(btn=>btn.addEventListener("click",()=>document.getElementById(btn.dataset.open).showModal()));
+    document.querySelectorAll("[data-close]").forEach(btn=>btn.addEventListener("click",()=>btn.closest("dialog").close()));
+
+    function renderMetrics(){
+      document.getElementById("metricOpps").textContent=opportunities.length+remoteOpportunities.length;
+      document.getElementById("metricBusinesses").textContent=businesses.length;
+      document.getElementById("metricProposals").textContent=proposalCount;
+      const soon=[...opportunities,...remoteOpportunities].filter(o=>{const date=o.closing||o.closingDate;if(!date)return false;const days=(new Date(date)-new Date())/86400000;return days>=0&&days<=7}).length;
+      document.getElementById("metricDeadlines").textContent=soon;
+    }
+    function renderOpportunities(){
+      const query=document.getElementById("oppSearch").value.toLowerCase(),stage=document.getElementById("oppFilter").value;
+      const combined=[...remoteOpportunities.map(o=>({...o,number:o.solicitationNumber||o.referenceNumber,closing:(o.closingDate||"").slice(0,10),fit:`${o.fitScore}%`,stage:"New match",remote:true})),...opportunities];
+      const filtered=combined.filter(o=>(stage==="all"||o.stage===stage)&&[o.title,o.number,o.buyer].join(" ").toLowerCase().includes(query));
+      document.getElementById("opportunityRows").innerHTML=filtered.map(o=>`<tr><td><strong>${escapeHtml(o.title)}</strong><br><small>${escapeHtml(o.number)}</small>${o.remote?'<br><span class="tag">CanadaBuys</span>':''}</td><td>${escapeHtml(o.buyer)}${o.buyerAddress?`<br><small>${escapeHtml(o.buyerAddress)}</small>`:""}</td><td>${escapeHtml(o.closing||"Not set")}${o.daysRemaining!==undefined?`<br><small>${escapeHtml(o.daysRemaining)} days</small>`:""}</td><td><span class="tag">${escapeHtml(o.fit)}</span>${o.fitReason?`<br><small>${escapeHtml(o.fitReason)}</small>`:""}</td><td>${escapeHtml(o.stage)}</td><td>${o.remote?`<a class="btn" href="${escapeHtml(o.url)}" target="_blank" rel="noopener">Open</a>`:`<button class="btn danger" onclick="removeOpportunity(${o.id})">Delete</button>`}</td></tr>`).join("");
+      document.getElementById("opportunityEmpty").hidden=filtered.length>0;
+      renderMetrics();
+    }
+    function renderBusinesses(){
+      const query=document.getElementById("businessSearch").value.toLowerCase();
+      const filtered=businesses.filter(b=>[b.name,b.industry,b.location,b.capabilities].join(" ").toLowerCase().includes(query));
+      document.getElementById("businessRows").innerHTML=filtered.map(b=>`<tr><td><strong>${escapeHtml(b.name)}</strong><br><small>${escapeHtml(b.industry)}</small></td><td>${escapeHtml(b.location||b.address)}</td><td>${escapeHtml(b.capabilities)}</td><td>${escapeHtml(b.fitReason)}</td><td><span class="tag">${escapeHtml(b.status)}</span></td><td><button class="btn" onclick="selectForProposal(${b.id})">Proposal</button> <button class="btn danger" onclick="removeBusiness(${b.id})">Delete</button></td></tr>`).join("");
+      document.getElementById("businessEmpty").hidden=filtered.length>0;
+      const select=document.getElementById("proposalBusiness"),current=select.value;
+      select.innerHTML='<option value="">Select a business</option>'+businesses.map(b=>`<option value="${b.id}">${escapeHtml(b.name)}</option>`).join(""); select.value=current;
+      renderMetrics();
+    }
+    window.removeOpportunity=async id=>{opportunities=opportunities.filter(o=>o.id!==id);await persistState();renderOpportunities()};
+    window.removeBusiness=async id=>{businesses=businesses.filter(b=>b.id!==id);await persistState();renderBusinesses()};
+    window.selectForProposal=id=>{document.querySelector('[data-view="proposals"]').click();document.getElementById("proposalBusiness").value=id;};
+
+    document.getElementById("opportunityForm").addEventListener("submit",async event=>{event.preventDefault();const data=Object.fromEntries(new FormData(event.target));opportunities.push({...data,id:Date.now()});await persistState();event.target.reset();document.getElementById("opportunityDialog").close();renderOpportunities()});
+    document.getElementById("businessForm").addEventListener("submit",async event=>{event.preventDefault();const data=Object.fromEntries(new FormData(event.target));businesses.push({...data,id:Date.now()});await persistState();event.target.reset();document.getElementById("businessDialog").close();renderBusinesses()});
+    document.getElementById("oppSearch").addEventListener("input",renderOpportunities);document.getElementById("oppFilter").addEventListener("change",renderOpportunities);document.getElementById("businessSearch").addEventListener("input",renderBusinesses);
+
+    async function refreshCanadaBuys(){
+      const status=document.getElementById("feedStatus"),button=document.getElementById("refreshCanadaBuys");
+      if(location.protocol==="file:"){status.textContent="The CanadaBuys connection is ready for a Netlify preview. It cannot run from a file opened directly on this computer.";return}
+      button.disabled=true;button.textContent="Checking…";status.textContent="Checking the official CanadaBuys open-tender dataset…";
+      try{
+        const response=await fetch("/.netlify/functions/canadabuys-rfqs");
+        if(!response.ok)throw new Error("Feed unavailable");
+        const data=await response.json();remoteOpportunities=data.opportunities||[];
+        status.textContent=`CanadaBuys checked ${new Date(data.checkedAt).toLocaleString()}. ${data.totalReviewed} open notices reviewed; ${data.matched} suitable matches displayed.`;
+        renderOpportunities();
+      }catch(error){status.textContent="CanadaBuys could not be checked right now. Existing records remain safe; try again later."}
+      finally{button.disabled=false;button.textContent="Check CanadaBuys"}
+    }
+    document.getElementById("refreshCanadaBuys").addEventListener("click",refreshCanadaBuys);
+
+    document.getElementById("generateProposal").addEventListener("click",async()=>{
+      const id=Number(document.getElementById("proposalBusiness").value),business=businesses.find(b=>b.id===id);
+      if(!business){alert("Select a small business first.");return}
+      const opportunity=document.getElementById("proposalOpportunity").value.trim()||"government contracting readiness and opportunity monitoring";
+      const help=document.getElementById("proposalHelp").value.trim()||"assess procurement readiness, identify suitable public-sector opportunities, organize mandatory requirements, and prepare professional compliant proposal packages.";
+      const today=new Intl.DateTimeFormat("en-CA",{year:"numeric",month:"long",day:"numeric"}).format(new Date());
+      const capabilities=(business.capabilities||business.industry||"your established products and services").trim().replace(/[.!?]+$/,""),helpSentence=help.trim().replace(/^we\s+/i,"").replace(/[.!?]+$/,""),opportunityText=opportunity.trim().replace(/[.!?]+$/,""),helpLead=/^(identify|assess|review|prepare|monitor|organize|support|match|source|track|manage|help)\b/i.test(helpSentence)?"Our team can ":"Our team will ";
+      document.getElementById("proposalOutput").innerHTML=`<div class="proposal-brand"><strong>AICHAMIYAA SUPPLIER</strong><br><span>Government Procurement & Bid Support</span></div><p class="proposal-meta">Prepared for: <strong>${escapeHtml(business.name)}</strong><br>${escapeHtml(business.address||business.location)}<br>Date: ${escapeHtml(today)}</p><h2>Government Contract Growth Proposal</h2><p>Dear ${escapeHtml(business.name)} Team,</p><p>Aichamiyaa Supplier has identified ${escapeHtml(business.name)} as a small business with capabilities that may be suitable for public-sector contracting. Based on publicly available information, your strengths include ${escapeHtml(capabilities)}.</p><h3>Opportunity</h3><p>We propose supporting your company with ${escapeHtml(opportunityText)}.</p><h3>How Aichamiyaa Supplier Can Help</h3><p>${helpLead}${escapeHtml(helpSentence)}.</p><h3>Proposed First Steps</h3><ol><li>Complete a procurement-readiness assessment.</li><li>Confirm service capacity, operating regions and required documentation.</li><li>Match the business with suitable active opportunities.</li><li>Prepare a clear bid/no-bid recommendation and compliant response plan.</li></ol><p>This proposal is an invitation to discuss fit and does not create any obligation. We would welcome a short discovery call to confirm whether government contracting aligns with your goals.</p><p><strong>Aichamiyaa Supplier</strong><br>Edmonton, Alberta, Canada<br>aichamiyaa@aichamiyaasupplierapp.com · 587-709-7444</p>`;
+      document.getElementById("proposalOutput").hidden=false;document.getElementById("proposalActions").hidden=false;proposalCount++;await persistState();renderMetrics();
+    });
+    document.getElementById("logout").addEventListener("click",async()=>{await fetch("/.netlify/functions/owner-session",{method:"DELETE"});location.replace("/login.html")});
+    (async()=>{try{await loadCloudState();renderOpportunities();renderBusinesses();renderMetrics();await refreshCanadaBuys()}catch(error){document.getElementById("feedStatus").textContent=error.message;renderOpportunities();renderBusinesses();renderMetrics()}})();
+  </script>
+</body>
+</html>

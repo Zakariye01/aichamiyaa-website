@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Aichamiyaa Owner Login</title>
+  <style>
+    :root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:#050505;color:#f7f7f7;font:16px/1.5 system-ui,sans-serif}.card{width:min(440px,calc(100% - 30px));padding:32px;border:1px solid rgba(212,175,55,.4);border-radius:16px;background:#0d0d0d}.mark{width:46px;height:46px;display:grid;place-items:center;border:2px solid #d4af37;border-radius:50%;color:#f6dc7a;font-weight:800}h1{margin:18px 0 5px;font-size:28px}p{color:#aaa}label{display:grid;gap:7px;margin:24px 0 14px}input,button{width:100%;padding:12px;border-radius:9px;font:inherit}input{border:1px solid #444;background:#060606;color:#fff}button{border:0;background:linear-gradient(135deg,#d4af37,#f6dc7a);color:#050505;font-weight:800;cursor:pointer}.error{min-height:24px;color:#ff8f8f;margin:12px 0 0}
+  </style>
+</head>
+<body><main class="card"><div class="mark">A</div><h1>Owner access</h1><p>Private Aichamiyaa Procurement Command Centre</p><form id="login"><label>Password<input name="password" type="password" autocomplete="current-password" required autofocus></label><button>Sign in securely</button><p id="message" class="error" role="alert"></p></form></main>
+<script>
+document.getElementById("login").addEventListener("submit",async event=>{event.preventDefault();const button=event.target.querySelector("button"),message=document.getElementById("message");button.disabled=true;message.textContent="";try{const response=await fetch("/.netlify/functions/owner-session",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({password:new FormData(event.target).get("password")})});const data=await response.json();if(!response.ok)throw new Error(data.error||"Login failed.");location.replace("/command-center.html")}catch(error){message.textContent=error.message}finally{button.disabled=false}});
+</script></body></html>
