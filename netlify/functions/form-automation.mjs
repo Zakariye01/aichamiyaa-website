@@ -43,6 +43,27 @@ export default async (request) => {
   await store().setJSON("customer-requests", customerRequests);
 
   console.log("Customer request saved:", customer);
+  const autoReplyUrl = process.env.GOOGLE_AUTOREPLY_URL;
+const automationSecret = process.env.AUTOMATION_SECRET;
+
+if (autoReplyUrl && automationSecret && customer.email) {
+  try {
+    const replyResponse = await fetch(autoReplyUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        secret: automationSecret,
+        name: customer.name,
+        email: customer.email,
+        message: customer.message
+      })
+    });
+
+    console.log("Auto-reply status:", replyResponse.status);
+  } catch (error) {
+    console.error("Auto-reply failed:", error);
+  }
+}
 
   return Response.json({
     received: true,
