@@ -2,10 +2,26 @@ import { getStore } from "@netlify/blobs";
 import { requireOwner, unauthorized, verifySameOrigin } from "../lib/auth.mjs";
 
 const store = () => getStore({ name: "aichamiyaa-command-centre", consistency: "strong" });
-const defaults = { manualOpportunities: [], businesses: [], proposalCount: 0, updatedAt: null };
+const defaults = {
+  manualOpportunities: [],
+  businesses: [],
+  proposalCount: 0,
+  customerRequests: [],
+  updatedAt: null
+};
 
 async function readState() {
-  return { ...defaults, ...((await store().get("owner-state", { type: "json" })) || {}) };
+  const ownerState =
+    (await store().get("owner-state", { type: "json" })) || {};
+
+  const customerRequests =
+    (await store().get("customer-requests", { type: "json" })) || [];
+
+  return {
+    ...defaults,
+    ...ownerState,
+    customerRequests
+  };
 }
 
 export default async function handler(request, context) {
