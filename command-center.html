@@ -339,19 +339,51 @@
     document.getElementById("businessForm").addEventListener("submit",async event=>{event.preventDefault();const data=Object.fromEntries(new FormData(event.target));businesses.push({...data,id:Date.now()});await persistState();event.target.reset();document.getElementById("businessDialog").close();renderBusinesses()});
     document.getElementById("oppSearch").addEventListener("input",renderOpportunities);document.getElementById("oppFilter").addEventListener("change",renderOpportunities);document.getElementById("businessSearch").addEventListener("input",renderBusinesses);
 
-    async function refreshCanadaBuys(){
-      const status=document.getElementById("feedStatus"),button=document.getElementById("refreshCanadaBuys");
-      if(location.protocol==="file:"){status.textContent="The CanadaBuys connection is ready for a Netlify preview. It cannot run from a file opened directly on this computer.";return}
-      button.disabled=true;button.textContent="Checking…";status.textContent="Checking the official CanadaBuys open-tender dataset…";
-      try{
-        const response=await fetch("/.netlify/functions/canadabuys-rfqs");
-        if(!response.ok)throw new Error("Feed unavailable");
-        const data=await response.json();remoteOpportunities=data.opportunities||[];
-        status.textContent=`CanadaBuys checked ${new Date(data.checkedAt).toLocaleString()}. ${data.totalReviewed} open notices reviewed; ${data.matched} suitable matches displayed.`;
-        renderOpportunities();
-      }catch(error){status.textContent="CanadaBuys could not be checked right now. Existing records remain safe; try again later."}
-      finally{button.disabled=false;button.textContent="Check CanadaBuys"}
-    }
+   async function refreshCanadaBuys(){
+  const status=document.getElementById("feedStatus"),
+        button=document.getElementById("refreshCanadaBuys");
+
+  if(location.protocol==="file:"){
+    status.textContent="The opportunity feeds require the Netlify website.";
+    return;
+  }
+
+  button.disabled=true;
+  button.textContent="Checking…";
+  status.textContent="Checking CanadaBuys and Alberta Purchasing Connection…";
+
+  try{
+    const [canadaResponse, albertaResponse]=await Promise.all([
+      fetch("/.netlify/functions/canadabuys-rfqs"),
+      fetch("/.netlify/functions/alberta-apc-rfqs?limit=250&offset=0")
+    ]);
+
+    if(!canadaResponse.ok) throw new Error("CanadaBuys feed unavailable");
+    if(!albertaResponse.ok) throw new Error("Alberta APC feed unavailable");
+
+    const canadaData=await canadaResponse.json();
+    const albertaData=await albertaResponse.json();
+
+    const canadaOpportunities=canadaData.opportunities||[];
+    const albertaOpportunities=albertaData.opportunities||[];
+
+    remoteOpportunities=[
+      ...canadaOpportunities,
+      ...albertaOpportunities
+    ];
+
+    status.textContent=
+      `Loaded ${canadaOpportunities.length} CanadaBuys opportunities and ${albertaOpportunities.length} Alberta APC opportunities.`;
+
+    renderOpportunities();
+  }catch(error){
+    status.textContent=
+      "Government opportunity feeds could not be checked right now. Existing records remain safe.";
+  }finally{
+    button.disabled=false;
+    button.textContent="Check Opportunities";
+  }
+}
     document.getElementById("refreshCanadaBuys").addEventListener("click",refreshCanadaBuys);
 
     document.getElementById("generateProposal").addEventListener("click",async()=>{
