@@ -106,6 +106,7 @@
         <button class="nav-btn active" data-view="overview">Overview</button>
         <button class="nav-btn" data-view="opportunities">Opportunities</button>
         <button class="nav-btn" data-view="businesses">Small Businesses</button>
+        <button class="nav-btn" data-view="customers">Customer Requests</button>
         <button class="nav-btn" data-view="proposals">Proposals</button>
         <button class="nav-btn" data-view="automation">Automation</button>
       </nav>
@@ -168,7 +169,35 @@
           <div id="businessEmpty" class="empty">No businesses recorded yet. Add one to test the tailored proposal workflow.</div>
         </article>
       </section>
+<section id="customers" class="view">
+  <article class="card">
+    <div class="card-head">
+      <div>
+        <span class="eyebrow">Website inquiries</span>
+        <h2>Customer Requests</h2>
+      </div>
+    </div>
 
+    <div id="customerRequestsEmpty" class="empty">
+      No customer requests yet.
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Message</th>
+            <th>Status</th>
+            <th>Received</th>
+          </tr>
+        </thead>
+        <tbody id="customerRequestsTable"></tbody>
+      </table>
+    </div>
+  </article>
+</section>
       <section id="proposals" class="view">
         <article class="card">
           <div class="card-head"><div><span class="eyebrow">Professional outreach</span><h2>Proposal Builder</h2></div></div>
