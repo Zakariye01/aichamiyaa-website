@@ -279,7 +279,8 @@
       if(!response.ok)throw new Error("Cloud records could not be loaded.");
       const state=await response.json(),localHasData=opportunities.length||businesses.length||proposalCount;
       if(!state.updatedAt&&localHasData){await persistState();return}
-      opportunities=state.manualOpportunities||[];businesses=state.businesses||[];proposalCount=Number(state.proposalCount)||0;
+      opportunities=state.manualOpportunities||[];businesses=state.businesses||[];proposalCount=Number(state.proposalCount)||0;customerRequests=state.customerRequests||[];
+      renderCustomerRequests();
       save(KEYS.opportunities,opportunities);save(KEYS.businesses,businesses);localStorage.setItem(KEYS.proposals,String(proposalCount));
     }
 
@@ -314,6 +315,22 @@
       select.innerHTML='<option value="">Select a business</option>'+businesses.map(b=>`<option value="${b.id}">${escapeHtml(b.name)}</option>`).join(""); select.value=current;
       renderMetrics();
     }
+    function renderCustomerRequests(){
+  const rows=document.getElementById("customerRequestsTable");
+  const empty=document.getElementById("customerRequestsEmpty");
+
+  rows.innerHTML=customerRequests.map(r=>`
+    <tr>
+      <td>${escapeHtml(r.name||"")}</td>
+      <td>${escapeHtml(r.email||"")}</td>
+      <td>${escapeHtml(r.message||"")}</td>
+      <td>${escapeHtml(r.status||"new")}</td>
+      <td>${escapeHtml(r.receivedAt ? new Date(r.receivedAt).toLocaleString() : "")}</td>
+    </tr>
+  `).join("");
+
+  empty.hidden=customerRequests.length>0;
+}
     window.removeOpportunity=async id=>{opportunities=opportunities.filter(o=>o.id!==id);await persistState();renderOpportunities()};
     window.removeBusiness=async id=>{businesses=businesses.filter(b=>b.id!==id);await persistState();renderBusinesses()};
     window.selectForProposal=id=>{document.querySelector('[data-view="proposals"]').click();document.getElementById("proposalBusiness").value=id;};
