@@ -242,20 +242,124 @@
     </form>
   </dialog>
 
-  <dialog id="businessDialog">
-    <form id="businessForm">
-      <div class="card-head"><h2>Add small business</h2><button type="button" class="btn" data-close>Close</button></div>
-      <div class="form-grid">
-        <label>Company name<input name="name" required></label><label>Industry<input name="industry"></label>
-        <label>Public business address<input name="address"></label><label>City / region<input name="location"></label>
-        <label>Website<input name="website" type="url" placeholder="https://"></label><label>Public phone<input name="phone"></label>
-        <label>Public email<input name="email" type="email"></label><label>Status<select name="status"><option>Research</option><option>Ready for outreach</option><option>Contacted</option><option>Client</option></select></label>
-        <label class="full">Products, services and capabilities<textarea name="capabilities"></textarea></label>
-        <label class="full">Why this company is a good fit<textarea name="fitReason"></textarea></label>
-      </div>
-      <div class="dialog-actions"><button type="button" class="btn" data-close>Cancel</button><button class="btn gold">Save business</button></div>
-    </form>
-  </dialog>
+ <dialog id="businessDialog">
+  <form id="businessForm">
+    <div class="card-head">
+      <h2>Add small business</h2>
+      <button type="button" class="btn" data-close>Close</button>
+    </div>
+
+    <div class="form-grid">
+      <label>
+        Company name
+        <input name="name" required>
+      </label>
+
+      <label>
+        Industry
+        <input name="industry">
+      </label>
+
+      <label>
+        Public business address
+        <input name="address">
+      </label>
+
+      <label>
+        City / region
+        <input name="location">
+      </label>
+
+      <label>
+        Website
+        <input name="website" type="url" placeholder="https://">
+      </label>
+
+      <label>
+        Public phone
+        <input name="phone">
+      </label>
+
+      <label>
+        Public email
+        <input name="email" type="email">
+      </label>
+
+      <label>
+        Company size
+        <select name="companySize">
+          <option value="Unknown">Unknown</option>
+          <option value="Small">Small</option>
+          <option value="Medium">Medium</option>
+          <option value="Large">Large</option>
+        </select>
+      </label>
+
+      <label>
+        Status
+        <select name="status">
+          <option>Research</option>
+          <option>Ready for outreach</option>
+          <option>Contacted</option>
+          <option>Interested</option>
+          <option>Not interested</option>
+        </select>
+      </label>
+
+      <label>
+        Discovery source
+        <select name="discoverySource">
+          <option value="Manual">Manual</option>
+          <option value="Automated discovery">Automated discovery</option>
+          <option value="Website inquiry">Website inquiry</option>
+          <option value="Referral">Referral</option>
+          <option value="Other">Other</option>
+        </select>
+      </label>
+
+      <label>
+        Matched opportunity
+        <input name="matchedOpportunity">
+      </label>
+
+      <label>
+        Match score
+        <input name="matchScore" type="number" min="0" max="100" placeholder="0-100">
+      </label>
+
+      <label>
+        Outreach status
+        <select name="outreachStatus">
+          <option value="Not contacted">Not contacted</option>
+          <option value="Proposal ready">Proposal ready</option>
+          <option value="Email sent">Email sent</option>
+          <option value="Replied">Replied</option>
+          <option value="Follow-up required">Follow-up required</option>
+        </select>
+      </label>
+
+      <label>
+        Last contacted
+        <input name="lastContacted" type="date">
+      </label>
+
+      <label class="full">
+        Products, services and capabilities
+        <textarea name="capabilities"></textarea>
+      </label>
+
+      <label class="full">
+        Why this company is a good fit
+        <textarea name="fitReason"></textarea>
+      </label>
+    </div>
+
+    <div class="dialog-actions">
+      <button type="button" class="btn" data-close>Cancel</button>
+      <button class="btn gold">Save business</button>
+    </div>
+  </form>
+</dialog>
 
   <script>
     const KEYS={opportunities:"aichamiyaa_cc_opportunities_v1",businesses:"aichamiyaa_cc_businesses_v1",proposals:"aichamiyaa_cc_proposals_v1"};
