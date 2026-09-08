@@ -241,13 +241,13 @@ export default async (request, context) => {
       ...existingBusinesses
     ].slice(0, 2000);
 
-    if (newBusinesses.length > 0) {
-      await store().setJSON(
-        "businesses",
-        updatedBusinesses
-      );
-    }
-
+   if (newBusinesses.length > 0) {
+  await store().setJSON("owner-state", {
+    ...ownerState,
+    businesses: updatedBusinesses,
+    updatedAt: new Date().toISOString()
+  });
+}
     return Response.json({
       success: true,
 
