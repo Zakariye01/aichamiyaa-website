@@ -212,14 +212,13 @@ export default async (request, context) => {
 
     const places = googleData.places || [];
 
-    const existingBusinesses =
-      (await store().get(
-        "businesses",
-        {
-          type: "json"
-        }
-      )) || [];
+   const ownerState =
+  (await store().get("owner-state", { type: "json" })) || {};
 
+const existingBusinesses =
+  Array.isArray(ownerState.businesses)
+    ? ownerState.businesses
+    : [];
     const discovered = places.map(place =>
       normalizeBusiness(
         place,
