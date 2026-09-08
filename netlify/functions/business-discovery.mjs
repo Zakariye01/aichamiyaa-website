@@ -165,8 +165,8 @@ function isDuplicate(existingBusinesses, candidate) {
   });
 }
 
-export default async request => {
-  const owner = await requireOwner(request);
+export default async (request, context) => {
+  const owner = await requireOwner(context);
 
   if (!owner) {
     return unauthorized();
