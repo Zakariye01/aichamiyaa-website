@@ -163,7 +163,23 @@
 
       <section id="businesses" class="view">
         <article class="card">
-          <div class="card-head"><div><span class="eyebrow">Prospects</span><h2>Small-Business Directory</h2></div><button class="btn gold" data-open="businessDialog">Add business</button></div>
+         <div class="card-head">
+  <div>
+    <span class="eyebrow">Prospects</span>
+    <h2>Small-Business Directory</h2>
+  </div>
+
+  <div class="toolbar">
+    <button id="testBusinessDiscovery" type="button" class="btn">
+      Test Business Discovery
+    </button>
+
+    <button class="btn gold" data-open="businessDialog">
+      Add business
+    </button>
+  </div>
+</div>
+          
           <div class="toolbar"><input id="businessSearch" class="search" placeholder="Search company, industry, city or capability"></div>
           <div class="table-wrap"><table><thead><tr><th>Company</th><th>Location</th><th>Capabilities</th><th>Fit reason</th><th>Status</th><th></th></tr></thead><tbody id="businessRows"></tbody></table></div>
           <div id="businessEmpty" class="empty">No businesses recorded yet. Add one to test the tailored proposal workflow.</div>
@@ -441,6 +457,45 @@
 
     document.getElementById("opportunityForm").addEventListener("submit",async event=>{event.preventDefault();const data=Object.fromEntries(new FormData(event.target));opportunities.push({...data,id:Date.now()});await persistState();event.target.reset();document.getElementById("opportunityDialog").close();renderOpportunities()});
     document.getElementById("businessForm").addEventListener("submit",async event=>{event.preventDefault();const data=Object.fromEntries(new FormData(event.target));businesses.push({...data,id:Date.now()});await persistState();event.target.reset();document.getElementById("businessDialog").close();renderBusinesses()});
+    document.getElementById("testBusinessDiscovery").addEventListener("click", async () => {
+  const button = document.getElementById("testBusinessDiscovery");
+
+  button.disabled = true;
+  button.textContent = "Searching...";
+
+  try {
+    const response = await fetch("/.netlify/functions/business-discovery", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        query: "commercial cleaning companies Edmonton Alberta",
+        matchedOpportunity: "TEST - Business Discovery",
+        maxResults: 3
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.details || data.error || "Business discovery failed.");
+    }
+
+    await loadCloudState();
+    renderBusinesses();
+    renderMetrics();
+
+    alert(
+      `Business discovery complete.\n\nFound: ${data.searched}\nAdded: ${data.added}\nDuplicates skipped: ${data.duplicatesSkipped}`
+    );
+  } catch (error) {
+    alert("Business discovery failed: " + error.message);
+  } finally {
+    button.disabled = false;
+    button.textContent = "Test Business Discovery";
+  }
+});
     document.getElementById("oppSearch").addEventListener("input",renderOpportunities);document.getElementById("oppFilter").addEventListener("change",renderOpportunities);document.getElementById("businessSearch").addEventListener("input",renderBusinesses);
 
    async function refreshCanadaBuys(){
