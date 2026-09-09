@@ -107,10 +107,16 @@ function normalize(record) {
     contactEmail: record["contactInfoEmail-informationsContactCourriel"],
     contactPhone: record["contactInfoPhone-contactInfoTelephone"],
     url: record["noticeURL-URLavis-eng"] || firstHttpUrl(record["attachment-piecesJointes-eng"]) || "https://canadabuys.canada.ca/en/tender-opportunities",
+    
     description: description.slice(0, 900),
-    fitScore: score,
-    fitReason: reasons.join(" · "),
-    daysRemaining: days
+
+preliminaryScore: score,
+fitScore: null,
+
+fitReason: "Waiting for RFP requirement analysis",
+requirementsStatus: "Not analyzed",
+
+daysRemaining: days
   };
 }
 
