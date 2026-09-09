@@ -126,7 +126,13 @@ export async function fetchCanadaBuysMatches() {
   const records = recordsFromCsv(await response.text());
   const unique = new Map();
   for (const opportunity of records.map(normalize).filter(Boolean)) unique.set(opportunity.id, opportunity);
-  const opportunities = [...unique.values()].sort((a, b) => b.fitScore - a.fitScore || a.daysRemaining - b.daysRemaining).slice(0, 300);
+ 
+  const opportunities = [...unique.values()].sort(
+  (a, b) =>
+    (b.fitScore ?? b.preliminaryScore ?? 0) -
+      (a.fitScore ?? a.preliminaryScore ?? 0) ||
+    a.daysRemaining - b.daysRemaining
+);
   return { source: "CanadaBuys Open Tender Notices", checkedAt: new Date().toISOString(), totalReviewed: records.length, matched: opportunities.length, opportunities };
 }
 
