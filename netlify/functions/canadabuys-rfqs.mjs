@@ -107,7 +107,8 @@ function normalize(record) {
     contactEmail: record["contactInfoEmail-informationsContactCourriel"],
     contactPhone: record["contactInfoPhone-contactInfoTelephone"],
     url: record["noticeURL-URLavis-eng"] || firstHttpUrl(record["attachment-piecesJointes-eng"]) || "https://canadabuys.canada.ca/en/tender-opportunities",
-    
+    noticeUrl: record["noticeURL-URLAvis-eng"] || "",
+attachmentUrl: firstHttpUrl(record["attachment-piecesJointes-eng"]) || "",
     description: description.slice(0, 900),
 
 preliminaryScore: score,
