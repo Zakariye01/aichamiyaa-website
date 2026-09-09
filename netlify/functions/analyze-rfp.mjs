@@ -1,4 +1,5 @@
 import { getStore } from "@netlify/blobs";
+import { PDFParse } from "pdf-parse";
 import { requireOwner, unauthorized } from "../lib/auth.mjs";
 
 const store = () =>
@@ -10,7 +11,18 @@ const store = () =>
 function clean(value = "") {
   return String(value || "").replace(/\s+/g, " ").trim();
 }
+async function readPdfText(url) {
+  if (!url) return "";
 
+  const parser = new PDFParse({ url });
+
+  try {
+    const result = await parser.getText();
+    return clean(result.text || "");
+  } finally {
+    await parser.destroy();
+  }
+}
 function extractRequirements(opportunity) {
   const text = clean(
     [
