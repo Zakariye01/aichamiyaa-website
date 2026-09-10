@@ -156,7 +156,7 @@
           <div class="card-head"><div><span class="eyebrow">Pipeline</span><h2>Government Opportunities</h2></div><div><button id="refreshCanadaBuys" class="btn">Check CanadaBuys</button> <button class="btn gold" data-open="opportunityDialog">Add opportunity</button></div></div>
           <p id="feedStatus" class="notice">The live feed activates in the Netlify preview. Manual records remain available below.</p>
           <div class="toolbar"><input id="oppSearch" class="search" placeholder="Search title, department or number"><select id="oppFilter"><option value="all">All stages</option><option>Review</option><option>Bid</option><option>Submitted</option><option>Awarded</option></select></div>
-          <div class="table-wrap"><table><thead><tr><th>Opportunity</th><th>Buyer</th><th>Closing</th><th>Fit</th><th>Stage</th><th></th></tr></thead><tbody id="opportunityRows"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>Opportunity</th><th>Buyer</th><th>Closing</th><th>Preliminary</th><th>RFP Fit</th><th>Requirements</th><th>Stage</th><th></th></tr>
           <div id="opportunityEmpty" class="empty">No opportunities recorded yet. The automated feed will populate this pipeline after it is connected.</div>
         </article>
       </section>
@@ -419,13 +419,62 @@
       document.getElementById("metricDeadlines").textContent=soon;
     }
     function renderOpportunities(){
-      const query=document.getElementById("oppSearch").value.toLowerCase(),stage=document.getElementById("oppFilter").value;
-      const combined=[...remoteOpportunities.map(o=>({...o,number:o.solicitationNumber||o.referenceNumber,closing:(o.closingDate||"").slice(0,10),fit:`${o.fitScore}%`,stage:"New match",remote:true})),...opportunities];
-      const filtered=combined.filter(o=>(stage==="all"||o.stage===stage)&&[o.title,o.number,o.buyer].join(" ").toLowerCase().includes(query));
-      document.getElementById("opportunityRows").innerHTML=filtered.map(o=>`<tr><td><strong>${escapeHtml(o.title)}</strong><br><small>${escapeHtml(o.number)}</small>${o.remote?'<br><span class="tag">CanadaBuys</span>':''}</td><td>${escapeHtml(o.buyer)}${o.buyerAddress?`<br><small>${escapeHtml(o.buyerAddress)}</small>`:""}</td><td>${escapeHtml(o.closing||"Not set")}${o.daysRemaining!==undefined?`<br><small>${escapeHtml(o.daysRemaining)} days</small>`:""}</td><td><span class="tag">${escapeHtml(o.fit)}</span>${o.fitReason?`<br><small>${escapeHtml(o.fitReason)}</small>`:""}</td><td>${escapeHtml(o.stage)}</td><td>${o.remote?`<a class="btn" href="${escapeHtml(o.url)}" target="_blank" rel="noopener">Open</a>`:`<button class="btn danger" onclick="removeOpportunity(${o.id})">Delete</button>`}</td></tr>`).join("");
-      document.getElementById("opportunityEmpty").hidden=filtered.length>0;
-      renderMetrics();
-    }
+  const query=document.getElementById("oppSearch").value.toLowerCase();
+  const stage=document.getElementById("oppFilter").value;
+
+  const combined=[
+    ...remoteOpportunities.map(o=>({
+      ...o,
+      number:o.solicitationNumber||o.referenceNumber,
+      closing:(o.closingDate||"").slice(0,10)
+    })),
+    ...opportunities
+  ];
+
+  const filtered=combined.filter(o=>
+    (stage==="all"||o.stage===stage) &&
+    [o.title,o.number,o.buyer].join(" ").toLowerCase().includes(query)
+  );
+
+  document.getElementById("opportunityRows").innerHTML=filtered.map(o=>`
+    <tr>
+      <td>
+        <strong>${escapeHtml(o.title||"")}</strong><br>
+        <small>${escapeHtml(o.number||"")}</small>
+      </td>
+
+      <td>${escapeHtml(o.buyer||"")}</td>
+
+      <td>${escapeHtml(o.closing||o.closingDate||"")}</td>
+
+      <td>
+        ${o.preliminaryScore != null
+          ? `${escapeHtml(String(o.preliminaryScore))}%`
+          : "—"}
+      </td>
+
+      <td>
+        ${o.fitScore != null
+          ? `<strong>${escapeHtml(String(o.fitScore))}%</strong>`
+          : "Pending analysis"}
+      </td>
+
+      <td>
+        ${escapeHtml(o.requirementsStatus||"Not analyzed")}
+      </td>
+
+      <td>${escapeHtml(o.stage||"New")}</td>
+
+      <td>
+        ${o.url
+          ? `<a class="btn" href="${escapeHtml(o.url)}" target="_blank" rel="noopener">View</a>`
+          : ""}
+      </td>
+    </tr>
+  `).join("");
+
+  document.getElementById("opportunityEmpty").hidden=filtered.length>0;
+}
     function renderBusinesses(){
       const query=document.getElementById("businessSearch").value.toLowerCase();
       const filtered=businesses.filter(b=>[b.name,b.industry,b.location,b.capabilities].join(" ").toLowerCase().includes(query));
