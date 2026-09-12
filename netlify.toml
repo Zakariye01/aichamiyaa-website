@@ -1,6 +1,7 @@
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"
+    external_node_modules = ["@napi-rs/canvas"]
 
 [[headers]]
   for = "/command-center.html"
