@@ -5,6 +5,6 @@
   
  "dependencies": {
   "@netlify/blobs": "^10.0.0",
-  "pdf-parse": "^2.4.5",
-  "@napi-rs/canvas": "^0.1.80"
+ "pdf-parse": "^2.4.5",
+"@napi-rs/canvas": "^0.1.80"
 }
