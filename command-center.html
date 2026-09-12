@@ -465,17 +465,77 @@
 
       <td>${escapeHtml(o.stage||"New")}</td>
 
-      <td>
-        ${o.url
-          ? `<a class="btn" href="${escapeHtml(o.url)}" target="_blank" rel="noopener">View</a>`
-          : ""}
-      </td>
+    <td>
+  <div style="display:flex;gap:6px;flex-wrap:wrap">
+    <button
+      class="btn"
+      type="button"
+      onclick="analyzeRfp('${escapeHtml(o.id||o.number||"")}')">
+      Analyze RFP
+    </button>
+
+    ${o.url
+      ? `<a class="btn" href="${escapeHtml(o.url)}" target="_blank" rel="noopener">View</a>`
+      : ""}
+  </div>
+</td>
     </tr>
   `).join("");
 
   document.getElementById("opportunityEmpty").hidden=filtered.length>0;
 }
-    function renderBusinesses(){
+async function analyzeRfp(opportunityId){
+  if(!opportunityId) return;
+
+  const button=event?.target;
+  const originalText=button?.textContent;
+
+  try{
+    if(button){
+      button.disabled=true;
+      button.textContent="Analyzing...";
+    }
+
+    const response=await fetch("/.netlify/functions/analyze-rfp",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({opportunityId})
+    });
+
+    if(response.status===401){
+      location.replace("/login.html");
+      return;
+    }
+
+    const result=await response.json();
+
+    if(!response.ok){
+      throw new Error(result.error||"RFP analysis failed.");
+    }
+
+    const opportunity=remoteOpportunities.find(o=>
+      o.id===opportunityId ||
+      o.referenceNumber===opportunityId ||
+      o.solicitationNumber===opportunityId
+    );
+
+    if(opportunity){
+      opportunity.requirementsStatus=result.analysis.requirementsStatus;
+      opportunity.fitScore=result.analysis.fitScore;
+      opportunity.rfpAnalysis=result.analysis;
+    }
+
+    renderOpportunities();
+
+  }catch(error){
+    alert(error.message);
+  }finally{
+    if(button){
+      button.disabled=false;
+      button.textContent=originalText||"Analyze RFP";
+    }
+  }
+}    function renderBusinesses(){
       const query=document.getElementById("businessSearch").value.toLowerCase();
       const filtered=businesses.filter(b=>[b.name,b.industry,b.location,b.capabilities].join(" ").toLowerCase().includes(query));
       document.getElementById("businessRows").innerHTML=filtered.map(b=>`<tr><td><strong>${escapeHtml(b.name)}</strong><br><small>${escapeHtml(b.industry)}</small></td><td>${escapeHtml(b.location||b.address)}</td><td>${escapeHtml(b.capabilities)}</td><td>${escapeHtml(b.fitReason)}</td><td><span class="tag">${escapeHtml(b.status)}</span></td><td><button class="btn" onclick="selectForProposal(${b.id})">Proposal</button> <button class="btn danger" onclick="removeBusiness(${b.id})">Delete</button></td></tr>`).join("");
