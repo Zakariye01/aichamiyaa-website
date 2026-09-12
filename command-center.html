@@ -523,6 +523,44 @@ async function analyzeRfp(opportunityId){
       opportunity.requirementsStatus=result.analysis.requirementsStatus;
       opportunity.fitScore=result.analysis.fitScore;
       opportunity.rfpAnalysis=result.analysis;
+      const discoveryQuery = [
+  opportunity.title,
+  result.analysis?.requirements?.serviceType,
+  result.analysis?.requirements?.deliveryLocation
+].filter(Boolean).join(" ");
+
+const discoveryResponse = await fetch("/.netlify/functions/business-discovery", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    query: discoveryQuery,
+    matchedOpportunity: opportunity.id || opportunity.referenceNumber || opportunity.solicitationNumber || "",
+    maxResults: 5
+  })
+});
+
+if (discoveryResponse.status === 401) {
+  location.replace("/login.html");
+  return;
+}
+
+if (discoveryResponse.ok) {
+  const discoveryResult = await discoveryResponse.json();
+
+  if (Array.isArray(discoveryResult.businesses) && discoveryResult.businesses.length) {
+    businesses = [...discoveryResult.businesses, ...businesses];
+
+    const seen = new Set();
+    businesses = businesses.filter(b => {
+      const key = b.googlePlaceId || b.name;
+      if (!key || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+
+    save(KEYS.businesses, businesses);
+  }
+}
     }
 
     renderOpportunities();
