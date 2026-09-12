@@ -1,4 +1,5 @@
 import { getStore } from "@netlify/blobs";
+import { CanvasFactory } from "pdf-parse/worker";
 import { PDFParse } from "pdf-parse";
 import { requireOwner, unauthorized } from "../lib/auth.mjs";
 
@@ -14,7 +15,7 @@ function clean(value = "") {
 async function readPdfText(url) {
   if (!url) return "";
 
-  const parser = new PDFParse({ url });
+  const parser = new PDFParse({ url, CanvasFactory });
 
   try {
     const result = await parser.getText();
