@@ -16,7 +16,7 @@ function normalizeText(value = "") {
 
 function calculateMatchScore(place, query) {
   let score = 50;
-
+ 
   const name = normalizeText(place.displayName?.text);
   const types = (place.types || []).map(normalizeText);
   const queryWords = normalizeText(query)
@@ -34,8 +34,45 @@ function calculateMatchScore(place, query) {
 
   return Math.min(score, 100);
 }
+function calculateRfpMatchScore(place, rfpRequirements = {}) {
+  let score = 50;
 
-function normalizeBusiness(place, query, matchedOpportunity = "") {
+  const placeText = normalizeText([
+    place.displayName?.text,
+    place.primaryTypeDisplayName?.text,
+    place.primaryType,
+    ...(place.types || []),
+    place.formattedAddress,
+    place.websiteUri
+  ].filter(Boolean).join(" "));
+
+  const serviceType = normalizeText(rfpRequirements.serviceType || "");
+  const deliveryLocation = normalizeText(rfpRequirements.deliveryLocation || "");
+
+  if (serviceType && placeText.includes(serviceType)) score += 20;
+
+  if (deliveryLocation) {
+    const locationWords = deliveryLocation
+      .split(/\s+/)
+      .filter(word => word.length > 3);
+
+    if (locationWords.some(word => placeText.includes(word))) {
+      score += 10;
+    }
+  }
+
+  if (place.websiteUri) score += 5;
+  if (place.nationalPhoneNumber) score += 5;
+
+  if (rfpRequirements.insuranceRequirements) score += 2;
+  if (rfpRequirements.experienceRequirements) score += 2;
+  if (rfpRequirements.certifications?.length) score += 2;
+  if (rfpRequirements.securityClearanceRequired) score += 2;
+  if (rfpRequirements.bondingRequired) score += 2;
+
+  return Math.min(score, 100);
+}
+function normalizeBusiness(place, query, matchedOpportunity = "", rfpRequirements = {}) {
   return {
     id: crypto.randomUUID(),
 
@@ -67,7 +104,7 @@ function normalizeBusiness(place, query, matchedOpportunity = "") {
     matchedOpportunity,
 
     matchScore: calculateMatchScore(place, query),
-
+    rfpMatchScore: calculateRfpMatchScore(place, rfpRequirements),
     outreachStatus: "Not contacted",
 
     lastContacted: "",
@@ -185,7 +222,7 @@ export default async (request, context) => {
 
   try {
     const body = await request.json();
-
+    const rfpRequirements = body.rfpRequirements || {};
     const query = String(body.query || "").trim();
 
     const matchedOpportunity =
@@ -223,7 +260,8 @@ const existingBusinesses =
       normalizeBusiness(
         place,
         query,
-        matchedOpportunity
+        matchedOpportunity,
+        rfpRequirements
       )
     );
 
