@@ -535,6 +535,7 @@ const discoveryResponse = await fetch("/.netlify/functions/business-discovery", 
   body: JSON.stringify({
     query: discoveryQuery,
     matchedOpportunity: opportunity.id || opportunity.referenceNumber || opportunity.solicitationNumber || "",
+    rfpRequirements: result.analysis?.requirements || {},
     maxResults: 5
   })
 });
