@@ -13,7 +13,38 @@ const store = () =>
 function normalizeText(value = "") {
   return String(value).trim().toLowerCase();
 }
+function isLikelyBusiness(place) {
+  const types = (place.types || []).map(normalizeText);
+  const name = normalizeText(place.displayName?.text);
 
+  const blockedTypes = [
+    "wildlife_refuge",
+    "national_park",
+    "park",
+    "tourist_attraction",
+    "government_office",
+    "local_government_office",
+    "museum",
+    "cemetery",
+    "school",
+    "university",
+    "hospital"
+  ];
+
+  if (types.some(type => blockedTypes.includes(type))) {
+    return false;
+  }
+
+  if (
+    name.includes("national wildlife area") ||
+    name.includes("national park") ||
+    name.includes("wildlife refuge")
+  ) {
+    return false;
+  }
+
+  return true;
+}
 function calculateMatchScore(place, query) {
   let score = 50;
  
@@ -256,7 +287,9 @@ const existingBusinesses =
   Array.isArray(ownerState.businesses)
     ? ownerState.businesses
     : [];
-    const discovered = places.map(place =>
+    const discovered = places
+  .filter(isLikelyBusiness)
+  .map(place =>
       normalizeBusiness(
         place,
         query,
