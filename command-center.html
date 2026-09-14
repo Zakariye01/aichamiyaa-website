@@ -694,7 +694,7 @@ if (discoveryResponse.ok) {
     document.getElementById("refreshCanadaBuys").addEventListener("click",refreshCanadaBuys);
 
     document.getElementById("generateProposal").addEventListener("click",async()=>{
-      const id=Number(document.getElementById("proposalBusiness").value),business=businesses.find(b=>b.id===id);
+     const id=String(document.getElementById("proposalBusiness").value),business=businesses.find(b=>String(b.id)===id);
       if(!business){alert("Select a small business first.");return}
       const opportunity=document.getElementById("proposalOpportunity").value.trim()||"government contracting readiness and opportunity monitoring";
       const help=document.getElementById("proposalHelp").value.trim()||"assess procurement readiness, identify suitable public-sector opportunities, organize mandatory requirements, and prepare professional compliant proposal packages.";
