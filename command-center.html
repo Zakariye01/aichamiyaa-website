@@ -581,6 +581,7 @@ if (discoveryResponse.ok) {
       document.getElementById("businessEmpty").hidden=filtered.length>0;
       const select=document.getElementById("proposalBusiness"),current=select.value;
       select.innerHTML='<option value="">Select a business</option>'+businesses.map(b=>`<option value="${b.id}">${escapeHtml(b.name)}</option>`).join(""); select.value=current;
+  if(current) select.value=String(current);
       renderMetrics();
     }
     function renderCustomerRequests(){
