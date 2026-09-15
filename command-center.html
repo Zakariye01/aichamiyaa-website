@@ -226,6 +226,37 @@
         </article>
         <div id="proposalOutput" class="proposal" hidden></div>
         <div id="proposalActions" class="dialog-actions" hidden><button class="btn" onclick="window.print()">Print / Save PDF</button></div>
+        <article id="outreachPreview" class="card" hidden>
+  <div class="card-head">
+    <div>
+      <span class="eyebrow">Approval required</span>
+      <h2>Outreach Email Preview</h2>
+    </div>
+  </div>
+
+  <div class="form-grid">
+    <label>
+      To
+      <input id="outreachEmail" type="email" placeholder="Business email">
+    </label>
+
+    <label>
+      Subject
+      <input id="outreachSubject" type="text">
+    </label>
+
+    <label class="full">
+      Email message
+      <textarea id="outreachMessage"></textarea>
+    </label>
+  </div>
+
+  <div class="dialog-actions">
+    <button id="approveOutreach" type="button" class="btn gold">Approve &amp; Send</button>
+  </div>
+
+  <p class="notice">Nothing will be sent until you approve it.</p>
+</article>
       </section>
 
       <section id="automation" class="view">
