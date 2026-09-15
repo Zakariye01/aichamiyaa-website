@@ -577,7 +577,7 @@ if (discoveryResponse.ok) {
 }    function renderBusinesses(){
       const query=document.getElementById("businessSearch").value.toLowerCase();
       const filtered=businesses.filter(b=>[b.name,b.industry,b.location,b.capabilities].join(" ").toLowerCase().includes(query));
-      document.getElementById("businessRows").innerHTML=filtered.map(b=>`<tr><td><strong>${escapeHtml(b.name)}</strong><br><small>${escapeHtml(b.industry)}</small></td><td>${escapeHtml(b.location||b.address)}</td><td>${escapeHtml(b.capabilities)}</td><td>${escapeHtml(b.fitReason)}</td><td><span class="tag">${escapeHtml(b.status)}</span></td><td><button class="btn" onclick="selectForProposal(&quot;${b.id}&quot;)">Proposal</button> <button class="btn danger" onclick="removeBusiness(&quot;${b.id}&quot;)"Delete</button></td></tr>`).join("");
+      document.getElementById("businessRows").innerHTML=filtered.map(b=>`<tr><td><strong>${escapeHtml(b.name)}</strong><br><small>${escapeHtml(b.industry)}</small></td><td>${escapeHtml(b.location||b.address)}</td><td>${escapeHtml(b.capabilities)}</td><td>${escapeHtml(b.fitReason)}</td><td><span class="tag">${escapeHtml(b.status)}</span></td><td><button class="btn" onclick="selectForProposal(&quot;${b.id}&quot;)">Proposal</button> <button class="btn danger" onclick="removeBusiness(&quot;${b.id}&quot;)">Delete</button></tr>`).join("");
       document.getElementById("businessEmpty").hidden=filtered.length>0;
       const select=document.getElementById("proposalBusiness"),current=select.value;
       select.innerHTML='<option value="">Select a business</option>'+businesses.map(b=>`<option value="${b.id}">${escapeHtml(b.name)}</option>`).join(""); select.value=current;
