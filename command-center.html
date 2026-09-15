@@ -781,49 +781,58 @@ outreachPreview.hidden = false;
   button.textContent = "Preparing PDF...";
 
   try {
-    const pdfSource = proposal.cloneNode(true);
+  const canvas = await html2canvas(proposal, {
+  scale: 2,
+  useCORS: true,
+  backgroundColor: "#ffffff"
+});
 
-pdfSource.hidden = false;
-pdfSource.removeAttribute("hidden");
+const imageData = canvas.toDataURL("image/jpeg", 0.98);
 
-pdfSource.style.position = "absolute";
-pdfSource.style.left = "0";
-pdfSource.style.top = "0";
-pdfSource.style.width = "794px";
-pdfSource.style.background = "#ffffff";
-pdfSource.style.color = "#151515";
-pdfSource.style.display = "block";
-pdfSource.style.visibility = "visible";
-pdfSource.style.zIndex = "-9999";
+const { jsPDF } = window.jspdf;
+const pdf = new jsPDF({
+  orientation: "portrait",
+  unit: "mm",
+  format: "a4"
+});
 
-document.body.appendChild(pdfSource);
+const pageWidth = pdf.internal.pageSize.getWidth();
+const pageHeight = pdf.internal.pageSize.getHeight();
 
-let pdfBlob;
+const imageWidth = pageWidth - 20;
+const imageHeight = canvas.height * imageWidth / canvas.width;
 
-try {
-  pdfBlob = await html2pdf()
-    .set({
-      margin: 10,
-      filename: "Aichamiyaa-Proposal.pdf",
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: "#ffffff",
-        windowWidth: 794
-      },
-      jsPDF: {
-        unit: "mm",
-        format: "a4",
-        orientation: "portrait"
-      }
-    })
-    .from(pdfSource)
-    .outputPdf("blob");
-} finally {
-  pdfSource.remove();
+let heightLeft = imageHeight;
+let position = 10;
+
+pdf.addImage(
+  imageData,
+  "JPEG",
+  10,
+  position,
+  imageWidth,
+  imageHeight
+);
+
+heightLeft -= pageHeight - 20;
+
+while (heightLeft > 0) {
+  position = heightLeft - imageHeight + 10;
+  pdf.addPage();
+
+  pdf.addImage(
+    imageData,
+    "JPEG",
+    10,
+    position,
+    imageWidth,
+    imageHeight
+  );
+
+  heightLeft -= pageHeight - 20;
 }
 
+const pdfBlob = pdf.output("blob");
     const pdfBase64 = await new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onloadend = () => resolve(reader.result.split(",")[1]);
