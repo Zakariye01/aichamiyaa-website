@@ -781,16 +781,48 @@ outreachPreview.hidden = false;
   button.textContent = "Preparing PDF...";
 
   try {
-    const pdfBlob = await html2pdf()
-      .set({
-        margin: 10,
-        filename: "Aichamiyaa-Proposal.pdf",
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
-      })
-      .from(proposal)
-      .outputPdf("blob");
+    const pdfSource = proposal.cloneNode(true);
+
+pdfSource.hidden = false;
+pdfSource.removeAttribute("hidden");
+
+pdfSource.style.position = "absolute";
+pdfSource.style.left = "0";
+pdfSource.style.top = "0";
+pdfSource.style.width = "794px";
+pdfSource.style.background = "#ffffff";
+pdfSource.style.color = "#151515";
+pdfSource.style.display = "block";
+pdfSource.style.visibility = "visible";
+pdfSource.style.zIndex = "-9999";
+
+document.body.appendChild(pdfSource);
+
+let pdfBlob;
+
+try {
+  pdfBlob = await html2pdf()
+    .set({
+      margin: 10,
+      filename: "Aichamiyaa-Proposal.pdf",
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#ffffff",
+        windowWidth: 794
+      },
+      jsPDF: {
+        unit: "mm",
+        format: "a4",
+        orientation: "portrait"
+      }
+    })
+    .from(pdfSource)
+    .outputPdf("blob");
+} finally {
+  pdfSource.remove();
+}
 
     const pdfBase64 = await new Promise((resolve, reject) => {
       const reader = new FileReader();
