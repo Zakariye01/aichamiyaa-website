@@ -97,6 +97,7 @@
       #proposalOutput { position: absolute; inset: 0; border: 0; }
     }
   </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
   <div class="shell">
@@ -758,6 +759,83 @@ Aichamiyaa Supplier`;
 
 outreachPreview.hidden = false;
     });
+    document.getElementById("approveOutreach").addEventListener("click", async () => {
+  const button = document.getElementById("approveOutreach");
+  const email = document.getElementById("outreachEmail").value.trim();
+  const subject = document.getElementById("outreachSubject").value.trim();
+  const message = document.getElementById("outreachMessage").value.trim();
+  const proposal = document.getElementById("proposalOutput");
+
+  if (!email || !subject || !message) {
+    alert("Email, subject and message are required.");
+    return;
+  }
+
+  if (!proposal || proposal.hidden) {
+    alert("Generate the proposal first.");
+    return;
+  }
+
+  const originalText = button.textContent;
+  button.disabled = true;
+  button.textContent = "Preparing PDF...";
+
+  try {
+    const pdfBlob = await html2pdf()
+      .set({
+        margin: 10,
+        filename: "Aichamiyaa-Proposal.pdf",
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+      })
+      .from(proposal)
+      .outputPdf("blob");
+
+    const pdfBase64 = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result.split(",")[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(pdfBlob);
+    });
+
+    button.textContent = "Sending...";
+
+    const response = await fetch("/.netlify/functions/send-outreach", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        email,
+        subject,
+        message,
+        pdfBase64,
+        pdfFileName: "Aichamiyaa-Proposal.pdf"
+      })
+    });
+
+    if (response.status === 401) {
+      location.replace("/login.html");
+      return;
+    }
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || "Email could not be sent.");
+    }
+
+    alert("Email and proposal PDF sent successfully.");
+    button.textContent = "Sent";
+
+  } catch (error) {
+    alert(error.message || "Outreach send failed.");
+    button.textContent = originalText;
+  } finally {
+    button.disabled = false;
+  }
+});
     document.getElementById("logout").addEventListener("click",async()=>{await fetch("/.netlify/functions/owner-session",{method:"DELETE"});location.replace("/login.html")});
     (async()=>{try{await loadCloudState();renderOpportunities();renderBusinesses();renderMetrics();await refreshCanadaBuys()}catch(error){document.getElementById("feedStatus").textContent=error.message;renderOpportunities();renderBusinesses();renderMetrics()}})();
   </script>
