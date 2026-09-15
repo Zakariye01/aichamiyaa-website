@@ -734,6 +734,29 @@ if (discoveryResponse.ok) {
       const capabilities=(business.capabilities||business.industry||"your established products and services").trim().replace(/[.!?]+$/,""),helpSentence=help.trim().replace(/^we\s+/i,"").replace(/[.!?]+$/,""),opportunityText=opportunity.trim().replace(/[.!?]+$/,""),helpLead=/^(identify|assess|review|prepare|monitor|organize|support|match|source|track|manage|help)\b/i.test(helpSentence)?"Our team can ":"Our team will ";
       document.getElementById("proposalOutput").innerHTML=`<div class="proposal-brand"><strong>AICHAMIYAA SUPPLIER</strong><br><span>Government Procurement & Bid Support</span></div><p class="proposal-meta">Prepared for: <strong>${escapeHtml(business.name)}</strong><br>${escapeHtml(business.address||business.location)}<br>Date: ${escapeHtml(today)}</p><h2>Government Contract Growth Proposal</h2><p>Dear ${escapeHtml(business.name)} Team,</p><p>Aichamiyaa Supplier has identified ${escapeHtml(business.name)} as a small business with capabilities that may be suitable for public-sector contracting. Based on publicly available information, your strengths include ${escapeHtml(capabilities)}.</p><h3>Opportunity</h3><p>We propose supporting your company with ${escapeHtml(opportunityText)}.</p><h3>How Aichamiyaa Supplier Can Help</h3><p>${helpLead}${escapeHtml(helpSentence)}.</p><h3>Proposed First Steps</h3><ol><li>Complete a procurement-readiness assessment.</li><li>Confirm service capacity, operating regions and required documentation.</li><li>Match the business with suitable active opportunities.</li><li>Prepare a clear bid/no-bid recommendation and compliant response plan.</li></ol><p>This proposal is an invitation to discuss fit and does not create any obligation. We would welcome a short discovery call to confirm whether government contracting aligns with your goals.</p><p><strong>Aichamiyaa Supplier</strong><br>Edmonton, Alberta, Canada<br>aichamiyaa@aichamiyaasupplierapp.com · 587-709-7444</p>`;
       document.getElementById("proposalOutput").hidden=false;document.getElementById("proposalActions").hidden=false;proposalCount++;await persistState();renderMetrics();
+      const outreachEmail = document.getElementById("outreachEmail");
+const outreachSubject = document.getElementById("outreachSubject");
+const outreachMessage = document.getElementById("outreachMessage");
+const outreachPreview = document.getElementById("outreachPreview");
+
+outreachEmail.value = business.email || "";
+
+outreachSubject.value =
+  `Government Contract Opportunities for ${business.name}`;
+
+outreachMessage.value =
+`Hello ${business.name} Team,
+
+Aichamiyaa Supplier identified your business as a potential fit for government contracting opportunities.
+
+We can help with opportunity identification, procurement readiness, compliance requirements and professional bid preparation.
+
+We have prepared information specifically for your business and would be happy to discuss how we can support your participation in public-sector contracts.
+
+Regards,
+Aichamiyaa Supplier`;
+
+outreachPreview.hidden = false;
     });
     document.getElementById("logout").addEventListener("click",async()=>{await fetch("/.netlify/functions/owner-session",{method:"DELETE"});location.replace("/login.html")});
     (async()=>{try{await loadCloudState();renderOpportunities();renderBusinesses();renderMetrics();await refreshCanadaBuys()}catch(error){document.getElementById("feedStatus").textContent=error.message;renderOpportunities();renderBusinesses();renderMetrics()}})();
